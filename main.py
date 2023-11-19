@@ -289,6 +289,60 @@ async def command_info(inter: disnake.ApplicationCommandInteraction, leader: dis
     await inter.response.defer()
 
     cur.execute("SELECT display_name, leader_id, member_1_id, member_2_id, member_3_id, member_4_id, member_5_id, "
+                "created_by_user_id, created_at FROM commands WHERE leader_id = ?", (leader.id, ))
+
+    if (temp := cur.fetchone()) is None:
+        embed = disnake.Embed(title=f"{leader.name} не є лідером команди", color=disnake.Color.yellow())
+        await inter.followup.send(embed=embed)
+
+        return
+
+    (display_name, leader_id, member_1_id, member_2_id, member_3_id, member_4_id, member_5_id,
+     created_by_user_id, created_at, *_) = temp
+
+    member_1: disnake.Member = inter.guild.get_member(member_1_id)
+    member_2: disnake.Member = inter.guild.get_member(member_2_id)
+    member_3: disnake.Member = inter.guild.get_member(member_3_id)
+    member_4: disnake.Member = inter.guild.get_member(member_4_id)
+    member_5: disnake.Member = inter.guild.get_member(member_5_id)
+    members = [member_1, member_2, member_3, member_4, member_5]
+    leader = member_1
+
+    created_by_user: disnake.Member = inter.guild.get_member(created_by_user_id)
+    created_at = datetime.fromisoformat(created_at)
+
+    _members = ""
+    for i, member in enumerate(members):
+        if member is None:
+            break
+
+        _members += f"{i}. {member.mention}\n"
+
+    embed = disnake.Embed(
+        title=f"Команда {display_name.upper()}",
+        description=f"Лідер: {leader.mention}",
+        color=disnake.Color.green()
+    )
+    embed.add_field("Учасники", _members, inline=False)
+    embed.set_footer(text=created_by_user.display_name, icon_url=created_by_user.avatar.url)
+    embed.timestamp = created_at
+
+    await inter.followup.send(embed=embed)
+
+
+@bot.slash_command(description="Повна інформація про команду")
+async def command_full_info(inter: disnake.ApplicationCommandInteraction, leader: disnake.Member):
+    await inter.response.defer()
+
+    admin_role = inter.guild.get_role(ADMIN_ROLE_ID)
+    if admin_role not in inter.user.roles:
+        embed = disnake.Embed(title=f"Тільки організатор може переглядати повну інформацію про команду",
+                              color=disnake.Color.red())
+        await inter.followup.send(embed=embed)
+
+        return
+
+    cur.execute("SELECT display_name, leader_id, member_1_id, member_2_id, member_3_id, member_4_id, member_5_id, "
                 "members_info, created_by_user_id, created_at FROM commands WHERE leader_id = ?", (leader.id, ))
 
     if (temp := cur.fetchone()) is None:
@@ -317,7 +371,10 @@ async def command_info(inter: disnake.ApplicationCommandInteraction, leader: dis
         if member is None:
             break
 
-        _members += f"{i}. {member.mention}\n"
+        _members += f"{i + 1}. {member.mention}\n"
+        _members += f"{members_info[str(member.id)]['first_name']} "
+        _members += f"{members_info[str(member.id)]['last_name']} "
+        _members += f"{members_info[str(member.id)]['group']} група\n"
 
     embed = disnake.Embed(
         title=f"Команда {display_name.upper()}",
@@ -327,6 +384,13 @@ async def command_info(inter: disnake.ApplicationCommandInteraction, leader: dis
     embed.add_field("Учасники", _members, inline=False)
     embed.set_footer(text=created_by_user.display_name, icon_url=created_by_user.avatar.url)
     embed.timestamp = created_at
+
+    await inter.user.send(embed=embed)
+
+    embed = disnake.Embed(
+        title=f"Інформація про команду {display_name.upper()} відправлена в особисті повідомлення",
+        color=disnake.Color.green()
+    )
 
     await inter.followup.send(embed=embed)
 
