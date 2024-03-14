@@ -134,7 +134,7 @@ class Commands(commands.Cog):
 
         await inter.followup.send(embed=embed)
 
-    @commands.slash_command(description="Видаляє команду")  # TODO: Clear user command in DB Users
+    @commands.slash_command(description="Видаляє команду")
     async def delete_command(self, inter: disnake.ApplicationCommandInteraction, leader: disnake.Member):
         await inter.response.defer()
 
