@@ -87,6 +87,10 @@ class MapPickView(disnake.ui.View):
     async def mirage(self, button: disnake.ui.Button, inter: disnake.Interaction):
         await self.on_button_click(button, inter)
 
+    @disnake.ui.button(label="Inferno", style=disnake.ButtonStyle.success, disabled=True)
+    async def inferno(self, button: disnake.ui.Button, inter: disnake.Interaction):
+        await self.on_button_click(button, inter)
+
     @disnake.ui.button(label="Overpass", style=disnake.ButtonStyle.success, disabled=True)
     async def overpass(self, button: disnake.ui.Button, inter: disnake.Interaction):
         await self.on_button_click(button, inter)
