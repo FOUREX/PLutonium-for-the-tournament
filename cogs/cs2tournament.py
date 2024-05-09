@@ -193,7 +193,7 @@ class PanelView(disnake.ui.View):
         await view.startup()
 
 
-class Tournament(commands.Cog):
+class CS2Tournament(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db: Database = self.bot.database
@@ -245,8 +245,8 @@ class Tournament(commands.Cog):
         match_id = self.db.create_match(first_command, second_command, panel.id, notice.id, inter.user.id)
 
         embed = (disnake.Embed(
-            title="Панель управління матчем",
-            description=f"ID: `{match_id}`\nМапа: не вибрана\nПереможець: не визначений",
+            title="Панель управління матчем\nCS2",
+            description=f"ID: `{match_id}`\nКуратор: {inter.user.mention}\nМапа: не вибрана\nПереможець: не визначений",
             color=disnake.Color.blue())
         )
         embed.add_field(
@@ -268,4 +268,4 @@ class Tournament(commands.Cog):
 
 
 def setup(bot: commands.Bot):
-    bot.add_cog(Tournament(bot))
+    bot.add_cog(CS2Tournament(bot))
