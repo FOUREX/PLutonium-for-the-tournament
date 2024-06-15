@@ -250,9 +250,9 @@ class Commands(commands.Cog):
 
         for i, command_member in enumerate(command.members):
             if command_member.reserved:
-                reserved += f"{i+1}. <@{command_member.id}>\n"
+                reserved += f"{i+1}. <@{command_member.id} | `{command_member.first_name}`>\n"
             else:
-                members += f"{i+1}. <@{command_member.id}>\n"  # get_user може повернути None і все піде нахуй :(
+                members += f"{i+1}. <@{command_member.id}> | `{command_member.first_name}`\n"  # get_user може повернути None і все піде нахуй :(
 
         embed = disnake.Embed(
             title=f"Команда {command.display_name}",
